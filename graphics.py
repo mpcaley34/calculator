@@ -14,6 +14,8 @@ class Window:
         self.__entry.grid(row=0, column=0, columnspan=4,
                           sticky='nsew', padx=5, pady=5)
 
+        self.__entry.bind("<KeyPress>", self.key_input)
+
         # Calculator Button Layout
         buttons = [
             ['7', '8', '9', '/'],
@@ -49,6 +51,38 @@ class Window:
                 self.__entry.insert('end', 'Error')
         else:
             self.__entry.insert('end', val)
+
+    def key_input(self, event):
+        keysym = event.keysym  # This works better on macOS
+
+        if keysym in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'plus', 'minus', 'asterisk', 'slash']:
+            keymap = {
+                'plus': '+',
+                'minus': '-',
+                'asterisk': '*',
+                'slash': '/',
+            }
+            val = keymap.get(keysym, keysym)
+            self.__entry.insert('end', val)
+
+        elif keysym == 'Return':
+            try:
+                result = eval(self.__entry.get())
+                self.__entry.delete(0, 'end')
+                self.__entry.insert('end', str(result))
+            except:
+                self.__entry.delete(0, 'end')
+                self.__entry.insert('end', 'Error')
+
+        elif keysym == 'BackSpace':
+            current = self.__entry.get()
+            self.__entry.delete(0, 'end')
+            self.__entry.insert(0, current[:-1])
+
+        elif keysym in ['Escape', 'Delete']:
+            self.__entry.delete(0, 'end')
+
+        return "break"  # Prevents double typing
 
     def run(self):
         self.__root.mainloop()
